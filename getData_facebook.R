@@ -36,7 +36,7 @@ library(tidyr)
 library(dplyr)
 
 # **************************************************************************** #
-# ***************                Baby.xlsx                                              
+# ***************       BEACH Report 3-23-18 to 3-29-18.xlsx                                              
 # **************************************************************************** #      
 
 # file parameters
@@ -44,7 +44,7 @@ n_max=10000
 data.file.name="BEACH Report 3-23-18 to 3-29-18.xlsx";data.file.name
 
 # **************************************************************************** #
-# ***************                baby_demography                                              
+# ***************                Results by Day of Week                                              
 # **************************************************************************** #
 
 # read data
@@ -58,5 +58,13 @@ names(dat)
 # rename
 newdata=rename(dat, reporting_starts = `Reporting Starts`, reporting_ends=`Reporting Ends`, ad_set_name='Ad Set Name', 
                delivery=Delivery, results=`Results`, result_indicator=`Result Indicator`, reach=Reach,
-               impressions=Impressions, cost_per_results='Cost per Results', budget=budget,
-               budget_type='Budget Type', amount_spent_USD='Amount Spent (USD)', ends=Ends);newdata
+               impressions=Impressions, cost_per_results='Cost per Results', budget=Budget,
+               budget_type='Budget Type', amount_spent_USD='Amount Spent (USD)', ends=Ends,
+               ends_1=Ends__1, starts=Starts, frequency=Frequency, unique_link_clicks='Unique Link Clicks',
+               button_clicks='Button Clicks');newdata; names(newdata)
+
+# compute day of week
+newdata %>% 
+  weekdays(as.Date(reporting_ends,'%Y-%m-%d',tz = "UTC"))
+
+
