@@ -34,14 +34,15 @@ library(readxl)
 library(data.table)
 library(tidyr)
 library(dplyr)
+library(ggplot2)
 
 # **************************************************************************** #
-# ***************       BEACH Report 3-23-18 to 3-29-18.xlsx                                              
+# ***************       BEACH Report 3-23-18 to 4-13-18.xlsx                                              
 # **************************************************************************** #      
 
 # file parameters
 n_max=10000
-data.file.name="BEACH Report 3-23-18 to 3-29-18.xlsx";data.file.name
+data.file.name="BEACH Report 3-23-18 to 4-13-18.xlsx";data.file.name
 
 # **************************************************************************** #
 # ***************                Results by Day of Week                                              
@@ -60,11 +61,29 @@ newdata=rename(dat, reporting_starts = `Reporting Starts`, reporting_ends=`Repor
                delivery=Delivery, results=`Results`, result_indicator=`Result Indicator`, reach=Reach,
                impressions=Impressions, cost_per_results='Cost per Results', budget=Budget,
                budget_type='Budget Type', amount_spent_USD='Amount Spent (USD)', ends=Ends,
-               ends_1=Ends__1, starts=Starts, frequency=Frequency, unique_link_clicks='Unique Link Clicks',
+               frequency=Frequency, unique_link_clicks='Unique Link Clicks',
                button_clicks='Button Clicks');newdata; names(newdata)
 
 # compute day of week
-newdata %>% 
-  weekdays(as.Date(reporting_ends,'%Y-%m-%d',tz = "UTC"))
+newdata$weekday=weekdays(as.Date(newdata$reporting_ends,'%Y-%m-%d',tz = "UTC"))
+
+# select data
+dat.days=newdata %>%
+  select(weekday,unique_link_clicks,button_clicks,cost_per_results) %>%
+  group_by(weekday) %>%
+  summarize(click.m=mean(unique_link_clicks),
+            button.m=mean(button_clicks),
+            cost.m=mean(cost_per_results)) %>%
+  mutate(weekday.c = factor(weekday, levels = c("Sunday","Monday","Tuesday","Wednesday",
+                                                "Thursday","Friday","Saturday")))
+# plot: click.m 
+ggplot(dat.days, aes(x=factor(weekday.c), y=click.m))+geom_bar(stat="identity")
+
+# plot: button.m 
+ggplot(dat.days, aes(x=factor(weekday.c), y=button.m))+geom_bar(stat="identity")
+
+# plot: cost.m 
+ggplot(dat.days, aes(x=factor(weekday.c), y=cost.m))+geom_bar(stat="identity")
+
 
 
