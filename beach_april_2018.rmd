@@ -5,7 +5,7 @@ date: "May 8, 2018"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 # library
@@ -33,19 +33,14 @@ n_max=10000
 data.file.name="BEACH Report 3-23-18 to 4-13-18.xlsx"
 
 # read data
+# day of week
+#------------
 day.dat=read_xlsx(paste(data.dir,data.file.name,sep=""), sheet = "Results by Day of Week", range = NULL, col_names = TRUE,
                    col_types = NULL, na = "NA", trim_ws = TRUE, skip = 0, n_max = Inf,
                    guess_max = min(1000, n_max))
-```
-
-## What is the distribution of facebook clicks throughout the week?
-
-
-```{r echo=FALSE, message = FALSE}
 
 # rename data
 dat=day.dat
-# names(dat)
 
 # rename variables
 newdata=rename(dat, reporting_starts = `Reporting Starts`, reporting_ends=`Reporting Ends`, ad_set_name='Ad Set Name', 
@@ -57,6 +52,30 @@ newdata=rename(dat, reporting_starts = `Reporting Starts`, reporting_ends=`Repor
 
 # compute "day of week" variables
 newdata$weekday=weekdays(as.Date(newdata$reporting_ends,'%Y-%m-%d',tz = "UTC"))
+
+# day of week
+#------------
+time.dat=read_xlsx(paste(data.dir,data.file.name,sep=""), sheet = "Results by Time of Day", range = NULL, col_names = TRUE,
+                   col_types = NULL, na = "NA", trim_ws = TRUE, skip = 0, n_max = Inf,
+                   guess_max = min(1000, n_max))
+
+# rename data
+dat2=time.dat
+
+# rename variables
+newdata.time=rename(dat2, reporting_starts = `Reporting Starts`, reporting_ends=`Reporting Ends`, ad_set_name='Ad Set Name', 
+               delivery=Delivery, results=`Results`, result_indicator=`Result Indicator`, reach=Reach,
+               impressions=Impressions, cost_per_results='Cost per Results', budget=Budget,
+               budget_type='Budget Type', amount_spent_USD='Amount Spent (USD)', ends=Ends,
+               frequency=Frequency, unique_link_clicks='Unique Link Clicks',
+               button_clicks='Button Clicks')
+
+```
+
+## What day of week did people click on the ad?
+
+
+```{r echo=FALSE, message = FALSE}
 
 # select and compute variables
 dat.days=newdata %>%
@@ -72,9 +91,9 @@ ggplot(dat.days, aes(x=factor(weekday.c), y=click.m))+geom_bar(stat="identity")
 
 ```
 
-## Including Plots
+## What times of day did people click on ad?
 
-You can also embed plots, for example:
+
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
