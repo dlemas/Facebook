@@ -20,7 +20,7 @@
 # Directory Locations
 work.dir=paste("C:\\Users\\",location,"\\Dropbox (UFL)\\02_Projects\\BEACH_STUDY\\01_Recruitment\\facebook\\data\\",sep="");work.dir
 data.dir=paste("C:\\Users\\",location,"\\Dropbox (UFL)\\02_Projects\\BEACH_STUDY\\01_Recruitment\\facebook\\data\\",sep="");data.dir
-out.dir=paste("C:\\Users\\",location,"\\Dropbox (UFL)\\02_Projects\\BEACH_STUDY\\01_Recruitment\\facebook\\table\\",sep="");out.dir
+out.dir=paste("C:\\Users\\",location,"\\Dropbox (UFL)\\02_Projects\\BEACH_STUDY\\01_Recruitment\\facebook\\rdata\\",sep="");out.dir
 
 # Set Working Directory
 setwd(work.dir)
@@ -87,6 +87,9 @@ dat.days=newdata %>%
             cost.m=mean(cost_per_results)) %>%
   mutate(weekday.c = factor(weekday, levels = c("Sunday","Monday","Tuesday","Wednesday",
                                                 "Thursday","Friday","Saturday")))
+# rename
+days.dat=dat.days
+
 # # plot: click.m 
 # ggplot(dat.days, aes(x=factor(weekday.c), y=click.m))+geom_bar(stat="identity")
 # 
@@ -136,6 +139,9 @@ newdata2$hours=as.factor(seq_along(newdata2$time_of_day))
 range(newdata2$hours)
 names(newdata2)
 
+# rename
+time.dat=newdata2
+
 # # plot: click.m 
 # ggplot(newdata2, aes(x=factor(hours), y=results))+geom_bar(stat="identity")
 
@@ -147,3 +153,47 @@ names(newdata2)
 age.dat=read_xlsx(paste(data.dir,data.file.name,sep=""), sheet = "Results by Age", range = NULL, col_names = TRUE,
                    col_types = NULL, na = "NA", trim_ws = TRUE, skip = 0, n_max = Inf,
                    guess_max = min(1000, n_max));age.dat
+
+# data
+dat=age.dat
+names(dat)
+
+# rename
+newdata3=rename(dat, reporting_starts = `Reporting Starts`, 
+                reporting_ends=`Reporting Ends`, 
+                ad_set_name='Ad Set Name', 
+                age=`Age`,
+                ad_set_delivery=`Ad Set Delivery`, 
+                results=`Results`, 
+                result_indicator='Result Indicator', 
+                reach=Reach,
+                impressions=Impressions, 
+                cost_per_results='Cost per Results', 
+                ad_set_budget='Ad Set Budget',
+                budget_type='Ad Set Budget Type', 
+                amount_spent_USD='Amount Spent (USD)', 
+                ends=Ends,
+                starts=Starts,
+                frequency=Frequency, 
+                unique_link_clicks='Unique Link Clicks',
+                link_clicks='Link Clicks');newdata3; names(newdata3)
+
+# select variables
+newdata4=newdata3 %>%
+  select(reporting_starts, reporting_ends,ad_set_name, age, ad_set_delivery,
+         results, result_indicator, reach, impressions, cost_per_results, 
+         ad_set_budget, budget_type, amount_spent_USD, ends, starts, frequency,
+         unique_link_clicks, link_clicks) 
+names(newdata4)
+age.dat=newdata4
+
+
+# combine into single object
+days.dat
+time.dat
+age.dat
+
+facebook=list(days.dat,time.dat,age.dat)
+facebook[1]
+
+save(facebook, file="BEACH_Facebook_ad.Rda")
